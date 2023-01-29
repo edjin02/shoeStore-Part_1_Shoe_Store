@@ -8,28 +8,28 @@ const auth = async (req, res, next) => {
     }
     const token = req.headers.authorization.split(" ")[1];
     let decodedData;
-    decodedData = jwt.verify(token, process.env.JWT);
-    req.userId = decodedData?.id;
-    req.user = await userDetail.findById(decodedData.id, "-password");
+    decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decodedData?._id;
+    req.user = await userDetail.findById(decodedData._id, "-password");
     next();
   } catch (error) {
-    res.status(440).json({ message: "unauthorized Auth" });
+    res.status(440).json({ message: "Login to continue" });
   }
 };
 
 const checkAdmin = async (req, res, next) => {
   try {
     if (!req.headers.authorization) {
-      return res.status(440).json({ message: "Unknown Request" });
+      return res.status(440).json({ message: "Unknown Header" });
     }
     const token = req.headers.authorization.split(" ")[1];
     let decodedData;
-    decodedData = jwt.verify(token, process.env.JWT);
-    if (decodedData?.role === 1) {
-      req.userId = decodedData?.id;
+    decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    if (decodedData?.role === true) {
+      req.userId = decodedData?._id;
       next();
     } else {
-      res.status(440).json({ message: "unauthorized Admin" });
+      res.status(440).json({ message: "Unauthorized Admin" });
     }
   } catch (error) {
     res.status(440).json({ message: error.message });
